@@ -177,7 +177,7 @@ func (kv *KV) Iter(start []byte, end []byte, reverse bool) iter.Seq2[[]byte, []b
 					skiphead = false
 					continue
 				}
-				if bytes.Compare(start, key) < 0 {
+				if bytes.Compare(key, start) < 0 {
 					return
 				}
 				if !yield(key, value) {
@@ -199,7 +199,7 @@ func (kv *KV) Iter(start []byte, end []byte, reverse bool) iter.Seq2[[]byte, []b
 					}
 					panic(err)
 				}
-				if bytes.Compare(end, key) >= 0 {
+				if bytes.Compare(key, end) >= 0 {
 					return
 				}
 				if !yield(key, value) {
