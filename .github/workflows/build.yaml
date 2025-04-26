@@ -6,6 +6,8 @@ on:
       - api/**
       - cmd/**
       - internal/**
+      - go.mod
+      - go.sum
       - .github/workflows/build.yaml
 
 jobs:
