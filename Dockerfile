@@ -11,7 +11,6 @@ RUN ln -s ld-musl-*.so.1 /dist/lib/
 
 FROM scratch
 COPY --from=builder /dist /
-USER 65534
 ENTRYPOINT ["/app"]
 VOLUME /data
 CMD ["-db", "/data/data.db"]
