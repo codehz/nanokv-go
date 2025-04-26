@@ -21,3 +21,7 @@ jobs:
         run: go generate ./...
       - name: Build
         run: go build ./cmd/nanokv
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nanokv
+          path: nanokv
