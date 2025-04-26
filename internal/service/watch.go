@@ -60,6 +60,9 @@ func (handler *WatchHandler) ProcessMessage(ctx context.Context, srv *Service, d
 	out := parsed.BuildFirstOutput(func(key []byte) *api.ValueHolder {
 		if raw := srv.main.Get(buf, key); raw != nil {
 			value.Decode(raw)
+			if value.LargeValue {
+				value.Value = srv.loadLargeValue(value.Value)
+			}
 			return &value
 		} else {
 			return nil

@@ -49,6 +49,9 @@ func (srv *Service) HandleAtomicWrite(input []byte) ([]byte, error) {
 						Key:          key,
 					}.Encode())
 				}
+				if old.LargeValue {
+					srv.removeLargeValue(old.Value)
+				}
 				kvevents[string(key)] = nil
 			}
 		}
@@ -79,6 +82,10 @@ func (srv *Service) HandleAtomicWrite(input []byte) ([]byte, error) {
 				ExpiresAt:    expiresAt,
 			}
 			kvevents[string(key)] = holder
+			if len(value) > 65536 {
+				holder.LargeValue = true
+				holder.Value = srv.storeLargeValue(value)
+			}
 			srv.main.Set(key, holder.Encode())
 			return nil
 		default:

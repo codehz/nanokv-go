@@ -14,6 +14,22 @@ type KV struct {
 	db   *DB
 }
 
+func (db *DB) NewKV() (*KV, int64) {
+	tree, handle, err := lldb.CreateBTree(db.store, bytes.Compare)
+	if err != nil {
+		panic(err)
+	}
+	return &KV{tree: tree, db: db}, handle
+}
+
+func (db *DB) GetKV(handle int64) (result *KV) {
+	tree, err := lldb.OpenBTree(db.store, bytes.Compare, handle)
+	if err != nil {
+		panic(err)
+	}
+	return &KV{tree: tree, db: db}
+}
+
 func (db *DB) EnsureKV(name string) (result *KV) {
 	if cached, ok := db.kvs[name]; ok {
 		return cached
@@ -53,7 +69,11 @@ func (db *DB) RemoveKV(name string) {
 	if key == nil {
 		return
 	}
-	if err := lldb.RemoveBTree(db.store, int64(binary.LittleEndian.Uint64(key))); err != nil {
+	db.RemoveKVByHandle(int64(binary.LittleEndian.Uint64(key)))
+}
+
+func (db *DB) RemoveKVByHandle(handle int64) {
+	if err := lldb.RemoveBTree(db.store, handle); err != nil {
 		panic(err)
 	}
 }

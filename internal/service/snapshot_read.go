@@ -15,6 +15,9 @@ func (srv *Service) HandleSnapshotRead(input []byte) ([]byte, error) {
 			raw := srv.main.Get(buf, start)
 			if raw != nil {
 				value.Decode(raw)
+				if value.LargeValue {
+					value.Value = srv.loadLargeValue(value.Value)
+				}
 				entries = append(entries, pkt.CreateKvEntry(start, &value))
 				return entries, nil
 			} else {
@@ -26,6 +29,9 @@ func (srv *Service) HandleSnapshotRead(input []byte) ([]byte, error) {
 		}
 		for key, raw := range srv.main.Iter(start, end, reverse) {
 			value.Decode(raw)
+			if value.LargeValue {
+				value.Value = srv.loadLargeValue(value.Value)
+			}
 			entries = append(entries, pkt.CreateKvEntry(key, &value))
 		}
 		return

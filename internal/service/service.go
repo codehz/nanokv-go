@@ -1,6 +1,7 @@
 package service
 
 import (
+	"encoding/binary"
 	"nanokv-go/api"
 	"nanokv-go/internal/emitter"
 	"nanokv-go/internal/group"
@@ -49,6 +50,7 @@ func (srv *Service) cleanExpires(now uint64) uint64 {
 	events := make(map[string]*api.ValueHolder)
 	next := uint64(0)
 	count := 0
+	buf := make([]byte, 1041)
 	for key := range srv.expires.All {
 		expiresKey.Decode(key)
 		if expiresKey.ExpiresAt > now {
@@ -60,7 +62,14 @@ func (srv *Service) cleanExpires(now uint64) uint64 {
 			break
 		}
 		srv.main.Delete(expiresKey.Key)
-		srv.expires.Delete(key)
+		oldraw := srv.expires.Extract(buf, key)
+		if oldraw != nil {
+			var old api.ValueHolder
+			old.Decode(oldraw)
+			if old.LargeValue {
+				srv.db.RemoveKVByHandle(int64(binary.LittleEndian.Uint64(old.Value)))
+			}
+		}
 		events[string(expiresKey.Key)] = nil
 		count++
 	}
