@@ -23,7 +23,9 @@ func (db *DB) Atomic() *Atomic {
 			db.mtx.Lock()
 			defer db.mtx.Unlock()
 			db.synctimer = nil
-			db.filer.EndUpdate()
+			if err := db.filer.EndUpdate(); err != nil {
+				panic(err)
+			}
 		})
 	}
 	db.begin()
