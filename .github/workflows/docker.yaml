@@ -10,7 +10,7 @@ on:
       - internal/**
       - go.mod
       - go.sum
-      - .github/workflows/docker.yml
+      - .github/workflows/docker.yaml
       - Dockerfile
     branches: ["main"]
   pull_request:
@@ -20,7 +20,7 @@ on:
       - internal/**
       - go.mod
       - go.sum
-      - .github/workflows/docker.yml
+      - .github/workflows/docker.yaml
       - Dockerfile
     branches: ["main"]
 
