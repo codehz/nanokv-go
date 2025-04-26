@@ -1,5 +1,7 @@
 package mkv
 
+import "time"
+
 type Atomic struct {
 	db       *DB
 	finished bool
@@ -13,6 +15,17 @@ func (db *DB) Atomic() *Atomic {
 			panic(err)
 		}
 	}()
+	if db.synctimer == nil {
+		if err := db.filer.BeginUpdate(); err != nil {
+			panic(err)
+		}
+		db.synctimer = time.AfterFunc(10*time.Second, func() {
+			db.mtx.Lock()
+			defer db.mtx.Unlock()
+			db.synctimer = nil
+			db.filer.EndUpdate()
+		})
+	}
 	db.begin()
 	return &Atomic{db: db, finished: false}
 }

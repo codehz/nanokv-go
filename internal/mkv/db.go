@@ -5,25 +5,21 @@ import (
 	"errors"
 	"os"
 	"sync"
+	"time"
 
 	"modernc.org/lldb"
 )
 
 type DB struct {
 	*KV
-	wal    *os.File
-	filer  lldb.Filer
-	store  *lldb.Allocator
-	mtx    *sync.RWMutex
-	kvs    map[string]*KV
-	update bool
+	wal       *os.File
+	filer     lldb.Filer
+	store     *lldb.Allocator
+	mtx       *sync.RWMutex
+	kvs       map[string]*KV
+	update    bool
+	synctimer *time.Timer
 }
-
-type NoSyncFiler struct {
-	lldb.SimpleFileFiler
-}
-
-func (f *NoSyncFiler) Sync() error { return nil }
 
 func OpenDB(path string) (*DB, error) {
 	file, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE, 0644)
@@ -35,7 +31,7 @@ func OpenDB(path string) (*DB, error) {
 		file.Close()
 		return nil, err
 	}
-	filer := &NoSyncFiler{SimpleFileFiler: *lldb.NewSimpleFileFiler(file)}
+	filer := lldb.NewSimpleFileFiler(file)
 	acid, err := lldb.NewACIDFiler(filer, wal)
 	if err != nil {
 		file.Close()
@@ -72,6 +68,11 @@ func OpenDB(path string) (*DB, error) {
 }
 
 func (db *DB) Close() {
+	if db.synctimer != nil {
+		db.synctimer.Stop()
+		db.synctimer = nil
+		db.filer.EndUpdate()
+	}
 	if err := db.filer.Sync(); err != nil {
 		panic(err)
 	}
