@@ -5,6 +5,7 @@ go 1.24.2
 require (
 	github.com/coder/websocket v1.8.13
 	github.com/google/flatbuffers v25.2.10+incompatible
+	github.com/kouhin/envflag v0.0.0-20150818174321-0e9a86061649
 	modernc.org/lldb v1.0.8
 )
 

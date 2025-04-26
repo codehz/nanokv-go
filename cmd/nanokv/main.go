@@ -11,6 +11,8 @@ import (
 	"os"
 	"os/signal"
 	"time"
+
+	"github.com/kouhin/envflag"
 )
 
 func main() {
@@ -23,7 +25,7 @@ func main() {
 		fmt.Fprintf(os.Stderr, "nanokv - simple key-value store with expiration and queue\n")
 		flag.PrintDefaults()
 	}
-	flag.Parse()
+	envflag.Parse()
 	addr := *addrPtr
 	dbPath := *dbPtr
 
