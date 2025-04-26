@@ -1,0 +1,107 @@
+namespace packet;
+
+table ReadRange {
+  start: [ubyte];
+  end: [ubyte];
+  limit: uint;
+  exact: bool;
+  reverse: bool;
+}
+
+table SnapshotRead {
+  requests: [ReadRange];
+}
+
+table KvEntry {
+  key: [ubyte];
+  value: [ubyte];
+  encoding: ubyte;
+  versionstamp: ulong;
+}
+
+table ReadRangeOutput {
+  values: [KvEntry];
+}
+
+table SnapshotReadOutput {
+  ranges: [ReadRangeOutput];
+}
+
+table Check {
+  key: [ubyte];
+  versionstamp: ulong;
+}
+
+enum MutationType: ubyte {
+  UNSPECIFIED = 0,
+  SET = 1,
+  DELETE = 2,
+}
+
+table Mutation {
+  type: MutationType;
+  key: [ubyte];
+  value: [ubyte];
+  encoding: ubyte;
+  expires_at: ulong;
+}
+
+table Enqueue {
+  key: [ubyte];
+  value: [ubyte];
+  encoding: ubyte;
+  schedule: ulong;
+}
+
+table Dequeue {
+  key: [ubyte];
+  schedule: ulong;
+  sequence: ulong;
+}
+
+table AtomicWrite {
+  checks: [Check];
+  mutations: [Mutation];
+  enqueues: [Enqueue];
+  dequeues: [Dequeue];
+}
+
+table AtomicWriteOutput {
+  ok: bool;
+  versionstamp: ulong;
+}
+
+table WatchKey {
+  key: [ubyte];
+}
+
+table Watch {
+  id: int;
+  keys: [WatchKey];
+}
+
+table WatchOutput {
+  id: int;
+  values: [KvEntry];
+}
+
+table ListenKey {
+  key: [ubyte];
+}
+
+table Listen {
+  added: [ListenKey];
+  removed: [ListenKey];
+}
+
+table QueueEntry {
+  key: [ubyte];
+  value: [ubyte];
+  encoding: ubyte;
+  schedule: ulong;
+  sequence: ulong;
+}
+
+table ListenOutput {
+  entries: [QueueEntry];
+}
