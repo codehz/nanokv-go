@@ -19,9 +19,14 @@ type DB struct {
 	kvs       map[string]*KV
 	update    bool
 	synctimer *time.Timer
+	options   *DBOptions
 }
 
-func OpenDB(path string) (*DB, error) {
+type DBOptions struct {
+	SyncInterval time.Duration
+}
+
+func OpenDB(path string, options DBOptions) (*DB, error) {
 	file, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE, 0644)
 	if err != nil {
 		return nil, err
@@ -62,7 +67,7 @@ func OpenDB(path string) (*DB, error) {
 		wal.Close()
 		return nil, err
 	}
-	result := &DB{wal: wal, filer: acid, store: store, mtx: &sync.RWMutex{}, kvs: map[string]*KV{}, update: false}
+	result := &DB{wal: wal, filer: acid, store: store, mtx: &sync.RWMutex{}, kvs: map[string]*KV{}, update: false, options: &options}
 	result.KV = &KV{tree: root, db: result}
 	return result, nil
 }

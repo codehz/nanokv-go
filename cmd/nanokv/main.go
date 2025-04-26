@@ -6,9 +6,11 @@ import (
 	"fmt"
 	"log"
 	"nanokv-go/internal/group"
+	"nanokv-go/internal/mkv"
 	"net/http"
 	"os"
 	"os/signal"
+	"time"
 )
 
 func main() {
@@ -16,6 +18,7 @@ func main() {
 	dbPtr := flag.String("db", "data.db", "path to database file")
 	certPtr := flag.String("cert", "", "path to tls cert file")
 	keyPtr := flag.String("key", "", "path to tls cert file")
+	syncIntervalPtr := flag.Duration("sync", time.Second, "sync interval")
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "nanokv - simple key-value store with expiration and queue\n")
 		flag.PrintDefaults()
@@ -26,7 +29,12 @@ func main() {
 
 	g := group.CreateGroup(context.Background())
 
-	srv := configServer(dbPath, g)
+	db, err := mkv.OpenDB(dbPath, mkv.DBOptions{SyncInterval: *syncIntervalPtr})
+	if err != nil {
+		panic(err)
+	}
+
+	srv := configServer(g, db)
 	web := &http.Server{Addr: addr}
 	defer srv.Close()
 

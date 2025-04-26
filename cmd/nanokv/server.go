@@ -13,11 +13,7 @@ import (
 	"github.com/coder/websocket"
 )
 
-func configServer(path string, g *group.Group) *service.Service {
-	db, err := mkv.OpenDB(path)
-	if err != nil {
-		panic(err)
-	}
+func configServer(g *group.Group, db *mkv.DB) *service.Service {
 	srv := service.NewService(db)
 	srv.Run(g)
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {

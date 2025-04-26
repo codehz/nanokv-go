@@ -15,11 +15,11 @@ func (db *DB) Atomic() *Atomic {
 			panic(err)
 		}
 	}()
-	if db.synctimer == nil {
+	if db.synctimer == nil && db.options.SyncInterval.Seconds() > 0 {
 		if err := db.filer.BeginUpdate(); err != nil {
 			panic(err)
 		}
-		db.synctimer = time.AfterFunc(10*time.Second, func() {
+		db.synctimer = time.AfterFunc(db.options.SyncInterval, func() {
 			db.mtx.Lock()
 			defer db.mtx.Unlock()
 			db.synctimer = nil
