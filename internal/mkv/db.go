@@ -19,6 +19,12 @@ type DB struct {
 	update bool
 }
 
+type NoSyncFiler struct {
+	lldb.SimpleFileFiler
+}
+
+func (f *NoSyncFiler) Sync() error { return nil }
+
 func OpenDB(path string) (*DB, error) {
 	file, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE, 0644)
 	if err != nil {
@@ -29,7 +35,7 @@ func OpenDB(path string) (*DB, error) {
 		file.Close()
 		return nil, err
 	}
-	filer := lldb.NewSimpleFileFiler(file)
+	filer := &NoSyncFiler{SimpleFileFiler: *lldb.NewSimpleFileFiler(file)}
 	acid, err := lldb.NewACIDFiler(filer, wal)
 	if err != nil {
 		file.Close()
