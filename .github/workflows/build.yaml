@@ -6,6 +6,7 @@ on:
       - api/**
       - cmd/**
       - internal/**
+      - .github/workflows/build.yaml
 
 jobs:
   build:
