@@ -1,0 +1,7 @@
+*.db
+*.db.wal
+/nanokv
+/api/packet
+/.github
+/.dockerignore
+/Dockerfile
