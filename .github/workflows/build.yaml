@@ -23,8 +23,6 @@ jobs:
             name: darwin-arm64
           - os: windows-latest
             name: windows-x86
-          - os: windows-11-arm
-            name: windows-arm64
           - os: windows-latest
             name: windows-x64
       fail-fast: false
