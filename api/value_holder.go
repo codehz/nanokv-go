@@ -34,6 +34,8 @@ func (holder *ValueHolder) Decode(data []byte) {
 	if holder.Encoding&0x80 != 0 {
 		holder.LargeValue = true
 		holder.Encoding = holder.Encoding & 0x7f
+	} else {
+		holder.LargeValue = false
 	}
 	holder.Versionstamp = binary.LittleEndian.Uint64(data[0:])
 	holder.ExpiresAt = binary.LittleEndian.Uint64(data[8:])
