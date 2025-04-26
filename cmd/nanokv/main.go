@@ -32,7 +32,7 @@ func main() {
 
 	g.Go(func(context.Context) {
 		var err error
-		if certPtr != nil && keyPtr != nil {
+		if len(*certPtr) > 0 && len(*keyPtr) > 0 {
 			err = web.ListenAndServeTLS(*certPtr, *keyPtr)
 		} else {
 			err = web.ListenAndServe()
@@ -47,7 +47,7 @@ func main() {
 
 	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, os.Interrupt)
-	if certPtr != nil && keyPtr != nil {
+	if len(*certPtr) > 0 && len(*keyPtr) > 0 {
 		log.Println("server started at", web.Addr, "with TLS")
 	} else {
 		log.Println("server started at", web.Addr)
