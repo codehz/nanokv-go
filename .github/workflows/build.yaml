@@ -16,7 +16,7 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: stable
-      - uses: aisightgmbh/actions-install-flatc@v1
+      - uses: Nugine/setup-flatc@v1
       - name: Generate
         run: go generate ./...
       - name: Build
