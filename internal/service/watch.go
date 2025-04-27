@@ -52,6 +52,8 @@ func (handler *WatchHandler) ProcessMessage(ctx context.Context, srv *Service, d
 		if handler.token != 0 {
 			handler.serivce.watch.RemoveSubscription(handler.token, keys)
 		}
+		handler.sender.Send(parsed.EmptyOutput())
+		return nil
 	}
 	view := srv.db.View()
 	defer view.Close()

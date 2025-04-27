@@ -30,6 +30,18 @@ func (watch *WatchRequest) Keys(yield func(int, []byte) bool) {
 	}
 }
 
+var emptyOutput = func() []byte {
+	builder := flatbuffers.NewBuilder(64)
+	packet.WatchOutputStart(builder)
+	packet.WatchOutputAddId(builder, 0)
+	builder.Finish(packet.WatchOutputEnd(builder))
+	return builder.FinishedBytes()
+}()
+
+func (watch *WatchRequest) EmptyOutput() []byte {
+	return emptyOutput
+}
+
 func (watch *WatchRequest) BuildFirstOutput(cb func(key []byte) *ValueHolder) []byte {
 	builder := flatbuffers.NewBuilder(4096)
 	l := watch.inner.KeysLength()
