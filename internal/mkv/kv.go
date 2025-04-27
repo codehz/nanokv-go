@@ -6,7 +6,7 @@ import (
 	"io"
 	"iter"
 
-	"modernc.org/lldb"
+	"nanokv-go/internal/lldb"
 )
 
 type KV struct {

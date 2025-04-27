@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	"modernc.org/lldb"
+	"nanokv-go/internal/lldb"
 )
 
 type DB struct {
