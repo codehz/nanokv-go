@@ -29,7 +29,10 @@ func main() {
 	addr := *addrPtr
 	dbPath := *dbPtr
 
-	g := group.CreateGroup(context.Background())
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
+	defer stop()
+
+	g := group.CreateGroup(ctx)
 
 	db, err := mkv.OpenDB(dbPath, mkv.DBOptions{SyncInterval: *syncIntervalPtr})
 	if err != nil {
@@ -55,26 +58,23 @@ func main() {
 
 	done := g.WaitChan()
 
-	sig := make(chan os.Signal, 1)
-	signal.Notify(sig, os.Interrupt)
 	if len(*certPtr) > 0 && len(*keyPtr) > 0 {
 		log.Println("server started at", web.Addr, "with TLS")
 	} else {
 		log.Println("server started at", web.Addr)
 	}
 	select {
-	case <-sig:
+	case <-ctx.Done():
 		log.Println("interrupted, exiting")
-		signal.Reset(os.Interrupt)
-		g.Cancel(nil)
-		web.Shutdown(g.Context())
-		if err := <-done; err != nil {
-			log.Fatalln("unexpected error after shutdown:", err)
-		}
+		defer func() {
+			if err := <-done; err != nil {
+				log.Fatalln("unexpected error after shutdown:", err)
+			}
+		}()
 	case err := <-done:
 		log.Println("unexpected error during startup:", err)
-		signal.Reset(os.Interrupt)
-		g.Cancel(nil)
-		web.Shutdown(g.Context())
 	}
+	stop()
+	g.Cancel(nil)
+	web.Shutdown(g.Context())
 }
