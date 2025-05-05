@@ -30,7 +30,6 @@ func main() {
 	dbPath := *dbPtr
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
-	defer stop()
 
 	g := group.CreateGroup(ctx)
 
